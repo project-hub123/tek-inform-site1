@@ -3,17 +3,17 @@ from flask import Flask
 from flask_login import LoginManager
 
 from config import DevelopmentConfig, ProductionConfig
-from app.database.models import db
+from app.database.models import db, User
 
 # ===== BLUEPRINTS САЙТА ООО «ТЭК ИНФОРМ» =====
 
-from app.routes.main import main_bp              # Главная, О компании, Контакты, Карта сайта
-from app.routes.services import services_bp      # Услуги
-from app.routes.articles import articles_bp      # Статьи
-from app.routes.news import news_bp               # Новости
-from app.routes.users import users_bp             # Личный кабинет
-from app.routes.admin import admin_bp             # Административная панель
-from app.routes.errors import errors_bp            # Ошибки 404, 403
+from app.routes.main import main_bp
+from app.routes.services import services_bp
+from app.routes.articles import articles_bp
+from app.routes.news import news_bp
+from app.routes.users import users_bp
+from app.routes.admin import admin_bp
+from app.routes.errors import errors_bp
 
 from app.components.auth import auth_bp, create_admin
 from app.components.search_engine import search_bp
@@ -23,27 +23,31 @@ def create_app():
     app = Flask(__name__)
 
     # ===== ВЫБОР КОНФИГУРАЦИИ =====
-    # На Render автоматически используется ProductionConfig
     if os.environ.get("RENDER"):
         app.config.from_object(ProductionConfig)
     else:
         app.config.from_object(DevelopmentConfig)
+
+    # ===== ЗАЩИТА ОТ ОТСУТСТВИЯ SECRET_KEY =====
+    if not app.config.get("SECRET_KEY"):
+        app.config["SECRET_KEY"] = "dev-secret-key"
 
     # ===== ИНИЦИАЛИЗАЦИЯ БАЗЫ ДАННЫХ =====
     db.init_app(app)
 
     with app.app_context():
         db.create_all()
-        # Создание администратора при первом запуске
-        create_admin()
+
+        # Создаём администратора ТОЛЬКО если его ещё нет
+        admin_exists = User.query.filter_by(role="admin").first()
+        if not admin_exists:
+            create_admin()
 
     # ===== НАСТРОЙКА FLASK-LOGIN =====
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
     login_manager.login_message = "Пожалуйста, войдите в систему"
     login_manager.init_app(app)
-
-    from app.database.models import User
 
     @login_manager.user_loader
     def load_user(user_id):
