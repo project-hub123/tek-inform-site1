@@ -5,8 +5,6 @@ from flask_login import LoginManager
 from config import DevelopmentConfig, ProductionConfig
 from app.database.models import db, User
 
-# ===== BLUEPRINTS САЙТА ООО «ТЭК ИНФОРМ» =====
-
 from app.routes.main import main_bp
 from app.routes.services import services_bp
 from app.routes.articles import articles_bp
@@ -28,9 +26,21 @@ def create_app():
     else:
         app.config.from_object(DevelopmentConfig)
 
+    # ===== ГАРАНТИРОВАННАЯ СТРОКА ПОДКЛЮЧЕНИЯ ДЛЯ RENDER =====
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql+psycopg2://", 1)
+        elif database_url.startswith("postgresql://"):
+            database_url = database_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+
+        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+
     # ===== ЗАЩИТА ОТ ОТСУТСТВИЯ SECRET_KEY =====
     if not app.config.get("SECRET_KEY"):
         app.config["SECRET_KEY"] = "dev-secret-key"
+
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     # ===== ИНИЦИАЛИЗАЦИЯ БАЗЫ ДАННЫХ =====
     db.init_app(app)
@@ -38,7 +48,6 @@ def create_app():
     with app.app_context():
         db.create_all()
 
-        # Создаём администратора ТОЛЬКО если его ещё нет
         admin_exists = User.query.filter_by(role="admin").first()
         if not admin_exists:
             create_admin()
