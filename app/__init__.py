@@ -1,7 +1,8 @@
+import os
 from flask import Flask
 from flask_login import LoginManager
 
-from config import DevelopmentConfig
+from config import DevelopmentConfig, ProductionConfig
 from app.database.models import db
 
 # ===== BLUEPRINTS САЙТА ООО «ТЭК ИНФОРМ» =====
@@ -20,7 +21,13 @@ from app.components.search_engine import search_bp
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(DevelopmentConfig)
+
+    # ===== ВЫБОР КОНФИГУРАЦИИ =====
+    # На Render автоматически используется ProductionConfig
+    if os.environ.get("RENDER"):
+        app.config.from_object(ProductionConfig)
+    else:
+        app.config.from_object(DevelopmentConfig)
 
     # ===== ИНИЦИАЛИЗАЦИЯ БАЗЫ ДАННЫХ =====
     db.init_app(app)
