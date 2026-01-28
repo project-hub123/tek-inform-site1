@@ -24,7 +24,7 @@ class User(db.Model, UserMixin):
         return f"<User {self.login}>"
 
 # -----------------------------------
-# МОДЕЛИ ДЛЯ СТАТЕЙ
+# МОДЕЛЬ СТАТЕЙ
 # -----------------------------------
 class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,13 +35,16 @@ class Article(db.Model):
         return f"<Article {self.title}>"
 
 # -----------------------------------
-# МОДЕЛИ ДЛЯ НОВОСТЕЙ
+# МОДЕЛЬ НОВОСТЕЙ
 # -----------------------------------
 class News(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     text = db.Column(db.Text, nullable=False)
-    date = db.Column(db.String(50), default=lambda: datetime.now().strftime("%Y-%m-%d"))
+    date = db.Column(
+        db.String(50),
+        default=lambda: datetime.now().strftime("%Y-%m-%d")
+    )
 
     def __repr__(self):
         return f"<News {self.title}>"
@@ -54,7 +57,8 @@ class Message(db.Model):
     name = db.Column(db.String(100), default="Гость")
     text = db.Column(db.Text, nullable=False)
     date = db.Column(
-        db.Column(db.String(50), default=lambda: datetime.now().strftime("%Y-%m-%d %H:%M"))
+        db.String(50),
+        default=lambda: datetime.now().strftime("%Y-%m-%d %H:%M")
     )
 
     def __repr__(self):
