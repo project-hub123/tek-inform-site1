@@ -38,9 +38,9 @@
                 {% endif %}
             {% endwith %}
 
-            <form method="post" action="{{ url_for('auth.register') }}">
-                <label for="username">Логин</label><br>
-                <input type="text" id="username" name="username" required><br><br>
+            <form method="POST" action="{{ url_for('auth.register') }}">
+                <label for="login">Логин</label><br>
+                <input type="text" id="login" name="login" required><br><br>
 
                 <label for="password">Пароль</label><br>
                 <input type="password" id="password" name="password" required><br><br>
