@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
@@ -7,7 +8,7 @@ db = SQLAlchemy()
 # -----------------------------------
 # МОДЕЛЬ ПОЛЬЗОВАТЕЛЯ
 # -----------------------------------
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     login = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
@@ -23,21 +24,38 @@ class User(db.Model):
         return f"<User {self.login}>"
 
 # -----------------------------------
-# МОДЕЛИ ДЛЯ СТАТЕЙ, НОВОСТЕЙ И СООБЩЕНИЙ
+# МОДЕЛИ ДЛЯ СТАТЕЙ
 # -----------------------------------
 class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     text = db.Column(db.Text, nullable=False)
 
+    def __repr__(self):
+        return f"<Article {self.title}>"
+
+# -----------------------------------
+# МОДЕЛИ ДЛЯ НОВОСТЕЙ
+# -----------------------------------
 class News(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     text = db.Column(db.Text, nullable=False)
-    date = db.Column(db.String(50), default=datetime.now().strftime("%Y-%m-%d"))
+    date = db.Column(db.String(50), default=lambda: datetime.now().strftime("%Y-%m-%d"))
 
+    def __repr__(self):
+        return f"<News {self.title}>"
+
+# -----------------------------------
+# МОДЕЛЬ СООБЩЕНИЙ
+# -----------------------------------
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), default="Гость")
     text = db.Column(db.Text, nullable=False)
-    date = db.Column(db.String(50), default=datetime.now().strftime("%Y-%m-%d %H:%M"))
+    date = db.Column(
+        db.Column(db.String(50), default=lambda: datetime.now().strftime("%Y-%m-%d %H:%M"))
+    )
+
+    def __repr__(self):
+        return f"<Message {self.id}>"
