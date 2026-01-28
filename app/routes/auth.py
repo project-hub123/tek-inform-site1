@@ -32,6 +32,11 @@ def login():
         login_value = request.form.get("login")
         password = request.form.get("password")
 
+        # КРИТИЧЕСКАЯ ПРОВЕРКА
+        if not login_value or not password:
+            flash("Введите логин и пароль", "error")
+            return redirect(url_for("auth.login"))
+
         user = User.query.filter_by(login=login_value).first()
 
         if user and user.check_password(password):
@@ -39,6 +44,7 @@ def login():
             return redirect(url_for("main.index"))
 
         flash("Неверный логин или пароль", "error")
+        return redirect(url_for("auth.login"))
 
     return render_template("login.html")
 
@@ -53,6 +59,11 @@ def register():
     if request.method == "POST":
         login_value = request.form.get("login")
         password = request.form.get("password")
+
+        # КРИТИЧЕСКАЯ ПРОВЕРКА
+        if not login_value or not password:
+            flash("Логин и пароль обязательны", "error")
+            return redirect(url_for("auth.register"))
 
         if User.query.filter_by(login=login_value).first():
             flash("Пользователь уже существует", "error")
