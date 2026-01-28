@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Карта сайта — ООО «ТЭК ИНФОРМ»</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>ООО «ТЭК ИНФОРМ»</h1>
+        <p>Системная интеграция и корпоративные информационные системы</p>
+
+        <nav>
+            <a href="{{ url_for('main.index') }}">Главная</a>
+            <a href="{{ url_for('articles.articles') }}">Статьи</a>
+            <a href="{{ url_for('main.about') }}">О компании</a>
+            <a href="{{ url_for('main.services') }}">Услуги</a>
+            <a href="{{ url_for('main.news') }}">Новости</a>
+            <a href="{{ url_for('main.contacts') }}">Контакты</a>
+
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('users.profile') }}">Личный кабинет</a>
+                <a href="{{ url_for('auth.logout') }}">Выход</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}">Вход</a>
+                <a href="{{ url_for('auth.register') }}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<main>
+    <section class="sitemap">
+        <div class="container">
+            <h2>Карта сайта</h2>
+
+            <p>
+                Карта сайта содержит перечень всех основных разделов и страниц
+                веб-ресурса ООО «ТЭК ИНФОРМ».
+            </p>
+
+            <ul class="sitemap-list">
+                <li>
+                    <a href="{{ url_for('main.index') }}">Главная страница</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('articles.articles') }}">Статьи</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('main.about') }}">О компании</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('main.services') }}">Услуги</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('main.news') }}">Новости</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('main.contacts') }}">Контакты</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('auth.login') }}">Вход в систему</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('auth.register') }}">Регистрация</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('users.profile') }}">Личный кабинет</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin.admin_index') }}">Административная панель</a>
+                </li>
+            </ul>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="container">
+        <p>© 2026 ООО «ТЭК ИНФОРМ». Все права защищены.</p>
+    </div>
+</footer>
+
+</body>
+</html>

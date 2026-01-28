@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: ferma-site
+    env: python
+    region: frankfurt
+    plan: free
+
+    buildCommand: |
+      pip install -r requirements.txt
+
+    startCommand: |
+      gunicorn app:app --bind 0.0.0.0:$PORT
+
+    envVars:
+      - key: FLASK_ENV
+        value: production
+
+      - key: SECRET_KEY
+        value: super_secret_key_123
+
+      - key: PYTHON_VERSION
+        value: 3.11
+
+    autoDeploy: true
