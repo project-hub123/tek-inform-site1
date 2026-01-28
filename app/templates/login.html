@@ -27,7 +27,7 @@
         <div class="container">
             <h2>Вход в систему</h2>
 
-            <!-- Сообщения Flask (ошибки/уведомления) -->
+            <!-- Сообщения Flask -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     <ul class="messages">
@@ -38,9 +38,9 @@
                 {% endif %}
             {% endwith %}
 
-            <form method="post" action="{{ url_for('auth.login') }}">
-                <label for="username">Логин</label><br>
-                <input type="text" id="username" name="username" required><br><br>
+            <form method="POST" action="{{ url_for('auth.login') }}">
+                <label for="login">Логин</label><br>
+                <input type="text" id="login" name="login" required><br><br>
 
                 <label for="password">Пароль</label><br>
                 <input type="password" id="password" name="password" required><br><br>
