@@ -38,8 +38,6 @@
             {% endwith %}
 
             <form method="post" action="{{ url_for('auth.login') }}" autocomplete="off">
-                <input type="hidden" name="csrf_token" value="static">
-
                 <label for="login">Логин</label><br>
                 <input type="text" name="login" id="login" required><br><br>
 

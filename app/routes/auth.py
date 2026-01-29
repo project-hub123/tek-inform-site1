@@ -11,7 +11,7 @@ auth_bp = Blueprint(
 )
 
 # -------------------------------------------------
-# СОЗДАНИЕ АДМИНИСТРАТОРА (БЕЗ ДУБЛИРОВАНИЯ)
+# СОЗДАНИЕ АДМИНИСТРАТОРА
 # -------------------------------------------------
 def create_admin():
     admin = User.query.filter_by(login="admin").first()
@@ -20,8 +20,7 @@ def create_admin():
 
     admin = User(
         login="admin",
-        role="admin",
-        password_hash=None
+        role="admin"
     )
     admin.set_password("admin123")
 
@@ -29,7 +28,7 @@ def create_admin():
     db.session.commit()
 
 # -------------------------------------------------
-# ВХОД В СИСТЕМУ
+# ВХОД
 # -------------------------------------------------
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
@@ -46,7 +45,6 @@ def login():
 
         user = User.query.filter_by(login=login_value).first()
 
-        # КРИТИЧЕСКАЯ ЗАЩИТА ОТ 500
         if not user or not user.password_hash:
             flash("Неверный логин или пароль", "error")
             return redirect(url_for("auth.login"))
@@ -61,7 +59,7 @@ def login():
     return render_template("login.html")
 
 # -------------------------------------------------
-# РЕГИСТРАЦИЯ ПОЛЬЗОВАТЕЛЯ
+# РЕГИСТРАЦИЯ
 # -------------------------------------------------
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
@@ -80,23 +78,28 @@ def register():
             flash("Пользователь уже существует", "error")
             return redirect(url_for("auth.register"))
 
-        user = User(
-            login=login_value,
-            role="user",
-            password_hash=None
-        )
-        user.set_password(password)
+        try:
+            user = User(
+                login=login_value,
+                role="user"
+            )
+            user.set_password(password)
 
-        db.session.add(user)
-        db.session.commit()
+            db.session.add(user)
+            db.session.commit()
 
-        flash("Регистрация прошла успешно", "success")
-        return redirect(url_for("auth.login"))
+            flash("Регистрация прошла успешно", "success")
+            return redirect(url_for("auth.login"))
+
+        except Exception:
+            db.session.rollback()
+            flash("Ошибка при регистрации", "error")
+            return redirect(url_for("auth.register"))
 
     return render_template("register.html")
 
 # -------------------------------------------------
-# ВЫХОД ИЗ СИСТЕМЫ
+# ВЫХОД
 # -------------------------------------------------
 @auth_bp.route("/logout")
 @login_required

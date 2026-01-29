@@ -27,7 +27,6 @@
         <div class="container">
             <h2>Регистрация пользователя</h2>
 
-            <!-- Сообщения Flask -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     <ul class="messages">
@@ -38,7 +37,7 @@
                 {% endif %}
             {% endwith %}
 
-            <form method="POST" action="{{ url_for('auth.register') }}">
+            <form method="post" action="{{ url_for('auth.register') }}" autocomplete="off">
                 <label for="login">Логин</label><br>
                 <input type="text" id="login" name="login" required><br><br>
 

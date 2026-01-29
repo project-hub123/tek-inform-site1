@@ -20,29 +20,31 @@ from app.components.search_engine import search_bp
 def create_app():
     app = Flask(__name__)
 
-    # ===== ВЫБОР КОНФИГУРАЦИИ =====
+    # ===== КОНФИГУРАЦИЯ =====
     if os.environ.get("RENDER"):
         app.config.from_object(ProductionConfig)
     else:
         app.config.from_object(DevelopmentConfig)
 
-    # ===== ГАРАНТИРОВАННАЯ СТРОКА ПОДКЛЮЧЕНИЯ ДЛЯ RENDER =====
-    database_url = os.environ.get("DATABASE_URL")
-    if database_url:
-        if database_url.startswith("postgres://"):
-            database_url = database_url.replace("postgres://", "postgresql+psycopg2://", 1)
-        elif database_url.startswith("postgresql://"):
-            database_url = database_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    # ===== БАЗА ДАННЫХ (ТОЛЬКО ИЗ ENV) =====
+    database_url = os.environ["DATABASE_URL"]
 
-        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace(
+            "postgres://", "postgresql+psycopg2://", 1
+        )
+    elif database_url.startswith("postgresql://"):
+        database_url = database_url.replace(
+            "postgresql://", "postgresql+psycopg2://", 1
+        )
 
-    # ===== ЗАЩИТА ОТ ОТСУТСТВИЯ SECRET_KEY =====
-    if not app.config.get("SECRET_KEY"):
-        app.config["SECRET_KEY"] = "dev-secret-key"
-
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-    # ===== ИНИЦИАЛИЗАЦИЯ БАЗЫ ДАННЫХ =====
+    # ===== SECRET KEY ТОЛЬКО ИЗ ENV =====
+    app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
+
+    # ===== ИНИЦИАЛИЗАЦИЯ БД =====
     db.init_app(app)
 
     with app.app_context():
@@ -52,7 +54,7 @@ def create_app():
         if not admin_exists:
             create_admin()
 
-    # ===== НАСТРОЙКА FLASK-LOGIN =====
+    # ===== FLASK-LOGIN =====
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
     login_manager.login_message = "Пожалуйста, войдите в систему"
@@ -60,9 +62,9 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(int(user_id))
+        return User.query.get(user_id)
 
-    # ===== РЕГИСТРАЦИЯ BLUEPRINTS =====
+    # ===== BLUEPRINTS =====
     app.register_blueprint(main_bp)
     app.register_blueprint(services_bp)
     app.register_blueprint(articles_bp)
