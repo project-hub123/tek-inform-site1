@@ -12,9 +12,7 @@ from app.routes.news import news_bp
 from app.routes.users import users_bp
 from app.routes.admin import admin_bp
 from app.routes.errors import errors_bp
-
-from app.components.auth import auth_bp, create_admin
-from app.components.search_engine import search_bp
+from app.routes.auth import auth_bp   # ← ТОЛЬКО ROUTES
 
 
 def create_app():
@@ -26,7 +24,7 @@ def create_app():
     else:
         app.config.from_object(DevelopmentConfig)
 
-    # ===== БАЗА ДАННЫХ (ТОЛЬКО ИЗ ENV) =====
+    # ===== БД =====
     database_url = os.environ["DATABASE_URL"]
 
     if database_url.startswith("postgres://"):
@@ -40,24 +38,24 @@ def create_app():
 
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-    # ===== SECRET KEY ТОЛЬКО ИЗ ENV =====
     app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
 
-    # ===== ИНИЦИАЛИЗАЦИЯ БД =====
+    # ===== БД INIT =====
     db.init_app(app)
 
     with app.app_context():
         db.create_all()
 
-        admin_exists = User.query.filter_by(role="admin").first()
-        if not admin_exists:
-            create_admin()
+        # создаём админа, если нет
+        if not User.query.filter_by(login="admin").first():
+            admin = User(login="admin", role="admin")
+            admin.set_password("admin123")
+            db.session.add(admin)
+            db.session.commit()
 
-    # ===== FLASK-LOGIN =====
+    # ===== LOGIN MANAGER =====
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
-    login_manager.login_message = "Пожалуйста, войдите в систему"
     login_manager.init_app(app)
 
     @login_manager.user_loader
@@ -72,7 +70,6 @@ def create_app():
     app.register_blueprint(users_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(auth_bp)
-    app.register_blueprint(search_bp)
     app.register_blueprint(errors_bp)
 
     return app
