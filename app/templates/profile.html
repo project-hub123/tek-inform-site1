@@ -36,7 +36,7 @@
             </p>
 
             <div class="profile-info">
-                <p><strong>Логин:</strong> {{ current_user.username }}</p>
+                <p><strong>Логин:</strong> {{ current_user.login }}</p>
                 <p><strong>Роль:</strong>
                     {% if current_user.role == 'admin' %}
                         Администратор
@@ -45,24 +45,6 @@
                     {% endif %}
                 </p>
             </div>
-
-            {% if current_user.role == 'admin' %}
-                <div class="admin-links">
-                    <h3>Административные функции</h3>
-                    <ul>
-                        <li>
-                            <a href="{{ url_for('admin.admin_index') }}">
-                                Перейти в административную панель
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ url_for('admin.admin_users') }}">
-                                Управление пользователями
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            {% endif %}
 
             <div class="profile-actions">
                 <a class="button" href="{{ url_for('auth.logout') }}">
